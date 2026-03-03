@@ -1,3 +1,9 @@
+import { data } from "@/data/todos";
+import {
+  Roboto_400Regular,
+  Roboto_500Medium,
+  useFonts,
+} from "@expo-google-fonts/roboto";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import { useState } from "react";
 import {
@@ -10,11 +16,18 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-import { data } from "@/data/todos";
-
 export default function Index() {
   const [todos, setTodos] = useState(data.sort((a, b) => b.id - a.id));
   const [text, setText] = useState("");
+
+  const [fontsLoaded, error] = useFonts({
+    Roboto_400Regular,
+    Roboto_500Medium,
+  });
+
+  if (!fontsLoaded && !error) {
+    return null;
+  }
 
   const addTodo = () => {
     if (text.trim()) {
@@ -79,10 +92,20 @@ export default function Index() {
   );
 }
 
+const typography = {
+  regular: {
+    fontFamily: "Roboto_400Regular",
+  },
+  medium: {
+    fontFamily: "Roboto_500Medium",
+  },
+};
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "black",
+    fontFamily: "Roboto_400Regular",
   },
   inputContainer: {
     flexDirection: "row",
@@ -95,6 +118,7 @@ const styles = StyleSheet.create({
     pointerEvents: "auto",
   },
   input: {
+    ...typography.regular,
     flex: 1,
     borderColor: "gray",
     borderWidth: 1,
@@ -111,6 +135,7 @@ const styles = StyleSheet.create({
     padding: 10,
   },
   addButtonText: {
+    ...typography.medium,
     fontSize: 18,
     color: "black",
   },
@@ -129,10 +154,12 @@ const styles = StyleSheet.create({
   },
   todoText: {
     flex: 1,
+    ...typography.regular,
     fontSize: 18,
     color: "white",
   },
   completedText: {
+    ...typography.regular,
     textDecorationLine: "line-through",
     color: "gray",
   },
