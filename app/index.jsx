@@ -9,14 +9,9 @@ import { useContext, useState } from "react";
 
 import { ThemeContext } from "@/context/ThemeContext";
 import { data } from "@/data/todos";
-import {
-  FlatList,
-  Pressable,
-  StyleSheet,
-  Text,
-  TextInput,
-  View,
-} from "react-native";
+import { StatusBar } from "expo-status-bar";
+import { Pressable, StyleSheet, Text, TextInput, View } from "react-native";
+import Animated, { LinearTransition } from "react-native-reanimated";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function Index() {
@@ -102,11 +97,18 @@ export default function Index() {
           />
         </Pressable>
       </View>
-      <FlatList
+      <Animated.FlatList
         data={todos}
         renderItem={renderItem}
         keyExtractor={(todo) => todo.id}
         contentContainerStyle={{ flexGrow: 1 }}
+        itemLayoutAnimation={LinearTransition}
+        keyboardDismissMode="on-drag"
+      />
+      <StatusBar
+        style={colorScheme === "dark" ? "light" : "dark"}
+        backgroundColor={theme.background}
+        translucent={false}
       />
     </SafeAreaView>
   );
