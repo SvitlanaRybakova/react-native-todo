@@ -1,5 +1,6 @@
 import { ThemeContext } from "@/context/ThemeContext";
 import { data } from "@/data/todos";
+import { useRouter } from "expo-router";
 import {
   Roboto_400Regular,
   Roboto_500Medium,
@@ -18,6 +19,7 @@ export default function Index() {
   const { theme, colorScheme, setColorScheme } = useContext(ThemeContext);
   const [todos, setTodos] = useState([]);
   const [text, setText] = useState("");
+  const router = useRouter();
 
   const [fontsLoaded, error] = useFonts({
     Roboto_400Regular,
@@ -82,14 +84,20 @@ export default function Index() {
     setTodos(todos.filter((todo) => todo.id !== id));
   };
 
+  const handlePress = (id) => {
+    router.push(`/todos/${id}`);
+  };
+  
   const renderItem = ({ item }) => (
     <View style={styles.todoItem}>
+      <Pressable onLongPress={() => toggleTodo(item.id)} onPress={()=> handlePress(item.id)}>
       <Text
         style={[styles.todoText, item.completed && styles.completedText]}
-        onPress={() => toggleTodo(item.id)}
+       
       >
         {item.title}
-      </Text>
+        </Text>
+        </Pressable>
       <Pressable onPress={() => removeTodo(item.id)}>
         <MaterialCommunityIcons
           name="delete-circle"
