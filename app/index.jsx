@@ -1,3 +1,5 @@
+import { ThemeContext } from "@/context/ThemeContext";
+import { data } from "@/data/todos";
 import {
   Roboto_400Regular,
   Roboto_500Medium,
@@ -5,18 +7,16 @@ import {
 } from "@expo-google-fonts/roboto";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import Octicons from "@expo/vector-icons/Octicons";
-import { useContext, useState } from "react";
-
-import { ThemeContext } from "@/context/ThemeContext";
-import { data } from "@/data/todos";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { StatusBar } from "expo-status-bar";
+import { useContext, useEffect, useState } from "react";
 import { Pressable, StyleSheet, Text, TextInput, View } from "react-native";
 import Animated, { LinearTransition } from "react-native-reanimated";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function Index() {
   const { theme, colorScheme, setColorScheme } = useContext(ThemeContext);
-  const [todos, setTodos] = useState(data.sort((a, b) => b.id - a.id));
+  const [todos, setTodos] = useState([]);
   const [text, setText] = useState("");
 
   const [fontsLoaded, error] = useFonts({
@@ -24,11 +24,43 @@ export default function Index() {
     Roboto_500Medium,
   });
 
+  const styles = createStyles(theme, colorScheme);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const jsonValue = await AsyncStorage.getItem("TodoApp");
+        const storageTodos = jsonValue != null ? JSON.parse(jsonValue) : null;
+
+        if (storageTodos && storageTodos.length) {
+          setTodos(storageTodos.sort((a, b) => b.id - a.id));
+        } else {
+          setTodos(data.sort((a, b) => b.id - a.id));
+        }
+      } catch (e) {
+        console.error(e);
+      }
+    };
+
+    fetchData();
+  }, [data]);
+
+  useEffect(() => {
+    const storeData = async () => {
+      try {
+        const jsonValue = JSON.stringify(todos);
+        await AsyncStorage.setItem("TodoApp", jsonValue);
+      } catch (e) {
+        console.error(e);
+      }
+    };
+
+    storeData();
+  }, [todos]);
+
   if (!fontsLoaded && !error) {
     return null;
   }
-
-  const styles = createStyles(theme, colorScheme);
 
   const addTodo = () => {
     if (text.trim()) {
